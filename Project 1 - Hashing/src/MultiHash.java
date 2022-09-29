@@ -5,13 +5,13 @@ import java.util.Random;
 public class MultiHash {
     int numEntries;
     int numHashes;
-    TableEntry[] hashTable;
+    int[] hashTable;
     List<Integer> hashFunctions;
 
     public MultiHash(int numEntries, int numHashes){
         this.numEntries = numEntries;
         this.numHashes = numHashes;
-        hashTable = new TableEntry[numEntries];
+        hashTable = new int[numEntries];
         generateHashFunctions();
     }
 
@@ -55,15 +55,15 @@ public class MultiHash {
             for (j = 0; j < hashFunctions.size(); j++) {
                 hashFun = hashFunctions.get(j);
                 int hashValue = flowId ^ hashFun;
-//                int hashCode = String.valueOf(hashValue).hashCode();
+                // int hashCode = String.valueOf(hashValue).hashCode();
                 int index = hashValue % numEntries;
                 //if empty;
-                if (hashTable[index] == null) {
-                    hashTable[index] = new TableEntry(flowId);
+                if (hashTable[index] == 0) {
+                    hashTable[index] = flowId;
                     hits++;
                     break;
-                } else if (hashTable[index].flowID == flowId) {
-                    hashTable[index].count++;
+                } else if (hashTable[index] == flowId) {
+                    //increment count
                     break;
                 }
             }
@@ -73,6 +73,10 @@ public class MultiHash {
         }
         System.out.println("Number of flows recorded = "+ hits);
         System.out.println("Number of flows missed = "+ misses);
+        System.out.println("\n==========================");
+        for (int entry: hashTable){
+            System.out.println(entry);
+        }
 
     }
 
@@ -83,20 +87,17 @@ public class MultiHash {
     }
 }
 
-class TableEntry{
-    int flowID;
-    int count;
-
-    public TableEntry(int flowID){
-        this.flowID = flowID;
-        count = 1;
-    }
-}
-
-//Input: number of table entries, number of flows, number of hashes – for demo, they are
-//        1000, 1000 and 3, respectively
-//        Function: generate flow IDs randomly, assume each flow has one packet, record one flow
-//        at a time into the hash table, and ignore the flows that cannot be placed into the hash
-//        table.
-//        Output: number of flows in the hash table, and the list of table entries (print out the flow
-//        ID if an entry has a flow or zero otherwise)
+//class TableEntry{
+//    int flowID;
+//    int count;
+//
+//    public TableEntry(int flowID){
+//        this.flowID = flowID;
+//        count = 1;
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return "flowId = "+flowID+", count= "+count;
+//    }
+//}
