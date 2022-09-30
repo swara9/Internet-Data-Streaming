@@ -17,7 +17,7 @@ public class MultiHash {
 
     private static int getRandom(){
         Random random = new Random();
-        return random.nextInt(Integer.MAX_VALUE - 1)+1;
+        return random.nextInt(Integer.MAX_VALUE - 1);
     }
 
     public static List<Integer> generateFlows(int numFlows){
@@ -75,7 +75,7 @@ public class MultiHash {
         System.out.println("Number of flows missed = "+ misses);
         System.out.println("\n==========================");
         for (int entry: hashTable){
-            System.out.println(entry);
+//            System.out.println(entry);
         }
 
     }
