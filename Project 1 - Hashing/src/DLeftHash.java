@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -44,19 +45,26 @@ public class DLeftHash {
         }
     }
 
-    public void receiveFlows(List<Integer> flows){
+    public void receiveFlows(List<Integer> flows) throws IOException {
         int hits = 0;
-        int misses = 0;
         for (int flowId: flows){
             if(receive(flowId)) hits++;
-            else misses++;
         }
-        System.out.println("Number of flows recorded = "+ hits);
-        System.out.println("Number of flows missed = "+ misses);
-        System.out.println("\n==========================");
+
+        File fout = new File("OutputDLeftHash.txt");
+        FileOutputStream fos = new FileOutputStream(fout);
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+        bw.write("Number of flows recorded = "+ hits);
+        bw.newLine();
+        bw.write("\n============ Hash Table ==============");
+        bw.newLine();
+
         for (TableEntry entry: hashTable){
-            System.out.println(entry == null ? 0 : entry.flowID);
+            int output = entry == null ? 0 : entry.flowID;
+            bw.write(Integer.toString(output));
+            bw.newLine();
         }
+        bw.close();
     }
 
     public boolean receive(int flowId){
@@ -95,7 +103,7 @@ public class DLeftHash {
         return false;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         List<Integer> flows = generateFlows(1000);
         DLeftHash dLeftHash = new DLeftHash(1000, 4);
         dLeftHash.receiveFlows(flows);
