@@ -6,14 +6,14 @@ public class CuckooHash {
 
     int numEntries;
     int numHashes;
-    int[] hashTable;
+    TableEntry[] hashTable;
     List<Integer> hashFunctions;
     int cuckooSteps;
 
     public CuckooHash(int numEntries, int numHashes, int cuckooSteps){
         this.numEntries = numEntries;
         this.numHashes = numHashes;
-        hashTable = new int[numEntries];
+        hashTable = new TableEntry[numEntries];
         generateHashFunctions();
         this.cuckooSteps = cuckooSteps;
     }
@@ -26,11 +26,8 @@ public class CuckooHash {
     public static List<Integer> generateFlows(int numFlows){
         List<Integer> flows = new ArrayList<>();
         int flowId;
-//        = getRandom();
         for (int i=0; i<numFlows; i++){
-//            while (flows.contains(flowId)){
-                flowId = getRandom();
-//            }
+            flowId = getRandom();
             flows.add(flowId);
         }
         return flows;
@@ -57,8 +54,8 @@ public class CuckooHash {
         System.out.println("Number of flows recorded = "+ hits);
         System.out.println("Number of flows missed = "+ misses);
         System.out.println("\n==========================");
-        for (int entry: hashTable){
-//            System.out.println(entry);
+        for (TableEntry entry: hashTable){
+            System.out.println(entry == null ? 0 : entry.flowID);
         }
     }
 
@@ -68,9 +65,14 @@ public class CuckooHash {
         for (int i=0; i<numHashes; i++){
             hashFun = hashFunctions.get(i);
             int hashValue = flowId ^ hashFun;
-            int index = hashValue % numEntries;
+            int hashCode = String.valueOf(hashValue).hashCode();
+            if(hashCode<0) hashCode = hashCode*-1;
+            int index = hashCode % numEntries;
             //increment counter
-            if(hashTable[index]== flowId) return true;
+            if(null!=hashTable[index] && hashTable[index].flowID == flowId) {
+                hashTable[index].count++;
+                return true;
+            }
         }
         return insert(flowId);
     }
@@ -80,10 +82,12 @@ public class CuckooHash {
         for (int i=0; i<numHashes; i++){
             hashFun = hashFunctions.get(i);
             int hashValue = flowId ^ hashFun;
-            int index = hashValue % numEntries;
+            int hashCode = String.valueOf(hashValue).hashCode();
+            if(hashCode<0) hashCode = hashCode*-1;
+            int index = hashCode % numEntries;
             //insert if empty
-            if(hashTable[index] == 0) {
-                hashTable[index] = flowId;
+            if(null == hashTable[index]) {
+                hashTable[index] = new TableEntry(flowId);
                 return true;
             }
         }
@@ -91,10 +95,12 @@ public class CuckooHash {
         for (int i=0; i<numHashes; i++){
             hashFun = hashFunctions.get(i);
             int hashValue = flowId ^ hashFun;
-            int index = hashValue % numEntries;
+            int hashCode = String.valueOf(hashValue).hashCode();
+            if(hashCode<0) hashCode = hashCode*-1;
+            int index = hashCode % numEntries;
             //insert if empty
             if(move(index, cuckooSteps)) {
-                hashTable[index] = flowId;
+                hashTable[index] = new TableEntry(flowId);
                 return true;
             }
         }
@@ -103,14 +109,16 @@ public class CuckooHash {
     }
 
     public boolean move(int index, int steps){
-        int currentFlow = hashTable[index];
+        TableEntry currentFlow = hashTable[index];
         int hashFun;
 
         for (int i=0; i<numHashes; i++){
             hashFun = hashFunctions.get(i);
-            int hashValue = currentFlow ^ hashFun;
-            int hashedIndex = hashValue % numEntries;
-            if(hashedIndex!=index && hashTable[hashedIndex]==0){
+            int hashValue = currentFlow.flowID ^ hashFun;
+            int hashCode = String.valueOf(hashValue).hashCode();
+            if(hashCode<0) hashCode = hashCode*-1;
+            int hashedIndex = hashCode % numEntries;
+            if(hashedIndex!=index && hashTable[hashedIndex]==null){
                 hashTable[hashedIndex] = currentFlow;
                 return true;
             }
@@ -119,8 +127,10 @@ public class CuckooHash {
         if(steps>1){
             for (int i=0; i<numHashes; i++) {
                 hashFun = hashFunctions.get(i);
-                int hashValue = currentFlow ^ hashFun;
-                int hashedIndex = hashValue % numEntries;
+                int hashValue = currentFlow.flowID ^ hashFun;
+                int hashCode = String.valueOf(hashValue).hashCode();
+                if(hashCode<0) hashCode = hashCode*-1;
+                int hashedIndex = hashCode % numEntries;
                 if(hashedIndex!=index && move(hashedIndex, steps-1)){
                     hashTable[hashedIndex] = currentFlow;
                     return true;
@@ -138,11 +148,3 @@ public class CuckooHash {
     }
 }
 
-//    Cuckoo hash table
-//        Input: number of table entries, number of flows, number of hashes, number of Cuckoo
-//        steps – for demo, they are 1000, 1000, 3, and 2, respectively
-//        Function: generate flow IDs randomly, assume each flow has one packet, record one flow
-//        at a time into the hash table, and ignore the flows that cannot be placed into the hash
-//        table.
-//        Output: number of flows in the hash table, and the list of table entries (print out the flow
-//        ID if an entry has a flow or zero otherwise)

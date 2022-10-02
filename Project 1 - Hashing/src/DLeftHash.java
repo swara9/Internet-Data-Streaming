@@ -6,14 +6,14 @@ public class DLeftHash {
 
     int numEntries;
     int numSegments;
-    int[] hashTable;
+    TableEntry[] hashTable;
     List<Integer> hashFunctions;
     int segmentSize;
 
     public DLeftHash(int numEntries, int numSegments){
         this.numEntries = numEntries;
         this.numSegments = numSegments;
-        hashTable = new int[numEntries];
+        hashTable = new TableEntry[numEntries];
         this.segmentSize = numEntries/ this.numSegments;
         generateHashFunctions();
     }
@@ -26,11 +26,8 @@ public class DLeftHash {
     public static List<Integer> generateFlows(int numFlows){
         List<Integer> flows = new ArrayList<>();
         int flowId;
-//        int flowId = getRandom();
         for (int i=0; i<numFlows; i++){
-//            while (flows.contains(flowId)){
             flowId = getRandom();
-//            }
             flows.add(flowId);
         }
         return flows;
@@ -57,8 +54,8 @@ public class DLeftHash {
         System.out.println("Number of flows recorded = "+ hits);
         System.out.println("Number of flows missed = "+ misses);
         System.out.println("\n==========================");
-        for (int entry: hashTable){
-            System.out.println(entry);
+        for (TableEntry entry: hashTable){
+            System.out.println(entry == null ? 0 : entry.flowID);
         }
     }
 
@@ -67,10 +64,12 @@ public class DLeftHash {
         for (int i=0; i<numSegments; i++){
             hashFun = hashFunctions.get(i);
             int hashValue = flowId ^ hashFun;
-            // int hashCode = String.valueOf(hashValue).hashCode();
-            int index = (hashValue % segmentSize)+(i*segmentSize);
-            if(hashTable[index]==flowId){
+            int hashCode = String.valueOf(hashValue).hashCode();
+            if(hashCode<0) hashCode = hashCode*-1;
+            int index = (hashCode % segmentSize)+(i*segmentSize);
+            if(null != hashTable[index] && hashTable[index].flowID==flowId){
                 //increment counter
+                hashTable[index].count++;
                 return true;
             }
         }
@@ -83,11 +82,12 @@ public class DLeftHash {
         for (int i=0; i<numSegments; i++){
             hashFun = hashFunctions.get(i);
             int hashValue = flowId ^ hashFun;
-            // int hashCode = String.valueOf(hashValue).hashCode();
-            int index = (hashValue % segmentSize)+(i*segmentSize);
-            if(hashTable[index]==0){
+            int hashCode = String.valueOf(hashValue).hashCode();
+            if(hashCode<0) hashCode = hashCode*-1;
+            int index = (hashCode % segmentSize)+(i*segmentSize);
+            if(null==hashTable[index]){
                 //increment counter
-                hashTable[index] = flowId;
+                hashTable[index] = new TableEntry(flowId);
                 return true;
             }
         }

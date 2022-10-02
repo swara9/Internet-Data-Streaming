@@ -5,13 +5,13 @@ import java.util.Random;
 public class MultiHash {
     int numEntries;
     int numHashes;
-    int[] hashTable;
+    TableEntry[] hashTable;
     List<Integer> hashFunctions;
 
     public MultiHash(int numEntries, int numHashes){
         this.numEntries = numEntries;
         this.numHashes = numHashes;
-        hashTable = new int[numEntries];
+        hashTable = new TableEntry[numEntries];
         generateHashFunctions();
     }
 
@@ -23,11 +23,8 @@ public class MultiHash {
     public static List<Integer> generateFlows(int numFlows){
         List<Integer> flows = new ArrayList<>();
         int flowId;
-//        int flowId = getRandom();
         for (int i=0; i<numFlows; i++){
-//            while (flows.contains(flowId)){
-                flowId = getRandom();
-//            }
+            flowId = getRandom();
             flows.add(flowId);
         }
         return flows;
@@ -56,15 +53,17 @@ public class MultiHash {
             for (j = 0; j < hashFunctions.size(); j++) {
                 hashFun = hashFunctions.get(j);
                 int hashValue = flowId ^ hashFun;
-                // int hashCode = String.valueOf(hashValue).hashCode();
-                int index = hashValue % numEntries;
+                int hashCode = String.valueOf(hashValue).hashCode();
+                if(hashCode<0) hashCode = hashCode*-1;
+                int index = hashCode % numEntries;
                 //if empty;
-                if (hashTable[index] == 0) {
-                    hashTable[index] = flowId;
+                if (null == hashTable[index]) {
+                    hashTable[index] = new TableEntry(flowId);
                     hits++;
                     break;
-                } else if (hashTable[index] == flowId) {
+                } else if (hashTable[index].flowID == flowId) {
                     //increment count
+                    hashTable[index].count += 1;
                     break;
                 }
             }
@@ -75,8 +74,8 @@ public class MultiHash {
         System.out.println("Number of flows recorded = "+ hits);
         System.out.println("Number of flows missed = "+ misses);
         System.out.println("\n==========================");
-        for (int entry: hashTable){
-//            System.out.println(entry);
+        for (TableEntry entry: hashTable){
+            System.out.println(entry == null ? 0 : entry.flowID);
         }
 
     }
@@ -87,18 +86,3 @@ public class MultiHash {
         multiHash.captureFlows(flows);
     }
 }
-
-//class TableEntry{
-//    int flowID;
-//    int count;
-//
-//    public TableEntry(int flowID){
-//        this.flowID = flowID;
-//        count = 1;
-//    }
-//
-//    @Override
-//    public String toString() {
-//        return "flowId = "+flowID+", count= "+count;
-//    }
-//}
