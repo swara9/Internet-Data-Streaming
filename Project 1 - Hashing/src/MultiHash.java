@@ -22,11 +22,12 @@ public class MultiHash {
 
     public static List<Integer> generateFlows(int numFlows){
         List<Integer> flows = new ArrayList<>();
-        int flowId = getRandom();
+        int flowId;
+//        int flowId = getRandom();
         for (int i=0; i<numFlows; i++){
-            while (flows.contains(flowId)){
+//            while (flows.contains(flowId)){
                 flowId = getRandom();
-            }
+//            }
             flows.add(flowId);
         }
         return flows;
