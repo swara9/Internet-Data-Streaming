@@ -89,5 +89,14 @@ public class MultiHash {
         List<Integer> flows = generateFlows(1000);
         MultiHash multiHash = new MultiHash(1000, 3);
         multiHash.captureFlows(flows);
+        if(args.length == 3) {
+            try {
+                flows = generateFlows(Integer.parseInt(args[1]));
+                multiHash = new MultiHash(Integer.parseInt(args[0]),Integer.parseInt(args[2]));
+                multiHash.captureFlows(flows);
+            } catch(NumberFormatException nfe) {
+                System.out.println("Please provide a valid Input");
+            }
+        }
     }
 }

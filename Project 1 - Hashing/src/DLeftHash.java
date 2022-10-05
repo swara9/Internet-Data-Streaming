@@ -107,5 +107,14 @@ public class DLeftHash {
         List<Integer> flows = generateFlows(1000);
         DLeftHash dLeftHash = new DLeftHash(1000, 4);
         dLeftHash.receiveFlows(flows);
+        if(args.length == 3) {
+            try {
+                flows = generateFlows(Integer.parseInt(args[1]));
+                dLeftHash = new DLeftHash(Integer.parseInt(args[0]),Integer.parseInt(args[2]));
+                dLeftHash.receiveFlows(flows);
+            } catch(NumberFormatException nfe) {
+                System.out.println("Please provide a valid Input");
+            }
+        }
     }
 }

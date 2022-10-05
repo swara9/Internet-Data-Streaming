@@ -153,6 +153,15 @@ public class CuckooHash {
         List<Integer> flows = generateFlows(1000);
         CuckooHash cuckooHash = new CuckooHash(1000,3,2);
         cuckooHash.receiveFlows(flows);
+        if(args.length == 4) {
+            try {
+                flows = generateFlows(Integer.parseInt(args[1]));
+                cuckooHash = new CuckooHash(Integer.parseInt(args[0]),Integer.parseInt(args[2]),Integer.parseInt(args[3]));
+                cuckooHash.receiveFlows(flows);
+            } catch(NumberFormatException nfe) {
+                System.out.println("Please provide a valid Input");
+            }
+        }
     }
 }
 
