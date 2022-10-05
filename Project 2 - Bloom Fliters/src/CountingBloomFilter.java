@@ -103,6 +103,24 @@ public class CountingBloomFilter {
         cbm.encode(setB);
         int lookupA = cbm.lookup(setA);
 
+        if(args.length == 5) {
+            try {
+                int numInitElements = Integer.parseInt(args[0]);
+                int numElementsToRemove = Integer.parseInt(args[1]);
+                int numElementsToAdd = Integer.parseInt(args[2]);
+                int numCountersPerFilter = Integer.parseInt(args[3]);
+                int numHashes = Integer.parseInt(args[4]);
+                cbm = new CountingBloomFilter(numCountersPerFilter, numHashes);
+                setA = generateSet(numInitElements);
+                cbm.encode(setA);
+                cbm.remove(numElementsToRemove, setA);
+                setB = generateSet(numElementsToAdd);
+                cbm.encode(setB);
+                lookupA = cbm.lookup(setA);
+            } catch(NumberFormatException nfe) {
+                System.out.println("Please provide a valid Input");
+            }
+        }
         File fout = new File("CountingBloomFilterOutput.txt");
         FileOutputStream fos = new FileOutputStream(fout);
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));

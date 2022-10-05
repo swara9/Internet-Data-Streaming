@@ -86,6 +86,22 @@ public class BloomFilter {
         List<Integer> setB = generateSet(1000);
         int lookupB = bloomFilter.lookup(setB);
 
+        if(args.length == 3) {
+            try {
+                int numElements = Integer.parseInt(args[0]);
+                int numBits = Integer.parseInt(args[1]);
+                int numHashes = Integer.parseInt(args[2]);
+                bloomFilter = new BloomFilter(numBits, numHashes);
+                setA = generateSet(numElements);
+                bloomFilter.encode(setA);
+                lookupA = bloomFilter.lookup(setA);
+                setB = generateSet(numElements);
+                lookupB = bloomFilter.lookup(setB);
+            } catch(NumberFormatException nfe) {
+                System.out.println("Please provide a valid Input");
+            }
+        }
+
         File fout = new File("BloomFilterOutput.txt");
         FileOutputStream fos = new FileOutputStream(fout);
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
