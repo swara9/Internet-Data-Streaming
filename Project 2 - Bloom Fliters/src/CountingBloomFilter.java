@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -93,13 +94,20 @@ public class CountingBloomFilter {
         return random.nextInt(Integer.MAX_VALUE - 1);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         CountingBloomFilter cbm = new CountingBloomFilter(10000, 7);
         List<Integer> setA = generateSet(1000);
         cbm.encode(setA);
         cbm.remove(500, setA);
         List<Integer> setB = generateSet(500);
         cbm.encode(setB);
-        System.out.println(cbm.lookup(setA));
+        int lookupA = cbm.lookup(setA);
+
+        File fout = new File("CountingBloomFilterOutput.txt");
+        FileOutputStream fos = new FileOutputStream(fout);
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+        bw.write("Number of elements after lookup of set A = "+ lookupA);
+        bw.close();
+        fos.close();
     }
 }

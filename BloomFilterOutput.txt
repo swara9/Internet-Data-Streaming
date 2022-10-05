@@ -1,0 +1,2 @@
+Number of elements after lookup of set A = 1000
+Number of elements after lookup of set B = 10

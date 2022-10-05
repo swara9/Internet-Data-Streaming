@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.*;
 
 public class CodingBloomFilter {
@@ -146,12 +147,18 @@ public class CodingBloomFilter {
         generateAllBinaryStrings(n, arr, i + 1, codes);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         CodingBloomFilter cbm = new CodingBloomFilter(7, 30000, 7);
         List<FlowSet> sets = generateSets(7, 1000);
-
         cbm.encode(sets);
-        System.out.println(cbm.lookup(sets));
+        int lookup = cbm.lookup(sets);
+
+        File fout = new File("CodingBloomFilterOutput.txt");
+        FileOutputStream fos = new FileOutputStream(fout);
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+        bw.write("Number of elements whose lookup results are correct = "+ lookup);
+        bw.close();
+        fos.close();
     }
 }
 

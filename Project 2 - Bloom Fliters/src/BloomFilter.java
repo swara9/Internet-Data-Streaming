@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -77,13 +78,21 @@ public class BloomFilter {
         return random.nextInt(Integer.MAX_VALUE - 1);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         BloomFilter bloomFilter = new BloomFilter(10000, 7);
         List<Integer> setA = generateSet(1000);
         bloomFilter.encode(setA);
-        System.out.println(bloomFilter.lookup(setA));
+        int lookupA = bloomFilter.lookup(setA);
         List<Integer> setB = generateSet(1000);
-        System.out.println(bloomFilter.lookup(setB));
+        int lookupB = bloomFilter.lookup(setB);
+
+        File fout = new File("BloomFilterOutput.txt");
+        FileOutputStream fos = new FileOutputStream(fout);
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+        bw.write("Number of elements after lookup of set A = "+ lookupA);
+        bw.write("\nNumber of elements after lookup of set B = "+ lookupB);
+        bw.close();
+        fos.close();
     }
 
 }
