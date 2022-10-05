@@ -1,14 +1,14 @@
 import java.util.*;
 
 public class CodingBloomFilter {
-    int numFilters; //3
-    int numBits; //30000
-    int numHashes; //7
+    int numFilters;
+    int numBits;
+    int numHashes;
     List<Integer> hashFunctions;
     List<int[]> codingBloomFilters;
 
-    public CodingBloomFilter(int numFilters, int numBits, int numHashes){
-        this.numFilters = numFilters;
+    public CodingBloomFilter(int numSets, int numBits, int numHashes){
+        this.numFilters = log2(numSets+1);
         this.numBits = numBits;
         this.numHashes = numHashes;
         this.codingBloomFilters = new ArrayList<>();
@@ -33,9 +33,12 @@ public class CodingBloomFilter {
         }
     }
 
-    public static List<FlowSet> generateSets(int numSets, int setSize, String[] codes) {
+    public static List<FlowSet> generateSets(int numSets, int setSize) {
         List<FlowSet> flowSets = new ArrayList<>();
         Set<Integer> unique = new HashSet<>();
+        List<String> codes = new ArrayList<>();
+        int codeBits = log2(numSets+1);
+        generateAllBinaryStrings(codeBits, new int[codeBits], 0, codes);
         FlowSet set;
         List<Integer> elements;
         for(int i=0; i<numSets; i++){
@@ -48,7 +51,7 @@ public class CodingBloomFilter {
                 elements.add(element);
                 unique.add(element);
             }
-            set = new FlowSet(codes[i], elements);
+            set = new FlowSet(codes.get(i+1), elements);
             flowSets.add(set);
         }
 
@@ -119,12 +122,34 @@ public class CodingBloomFilter {
         return random.nextInt(Integer.MAX_VALUE - 1);
     }
 
-    public static void main(String[] args) {
-        int numSets = 7;
-        String[] codes = {"001","010","011","100","101","110","111"};
-        List<FlowSet> sets = generateSets(numSets, 1000, codes);
+    private static int log2(int n){
+        return (int)Math.ceil((Math.log(n) / Math.log(2)));
+    }
 
-        CodingBloomFilter cbm = new CodingBloomFilter(3, 30000, 7);
+    // Function to generate all binary strings
+    static void generateAllBinaryStrings(int n, int[] arr, int i, List<String> codes)
+    {
+        if (i == n)
+        {
+            StringBuilder sb = new StringBuilder();
+            for(int num: arr){
+                sb.append(num);
+            }
+            codes.add(sb.toString());
+            return;
+        }
+
+        arr[i] = 0;
+        generateAllBinaryStrings(n, arr, i + 1, codes);
+
+        arr[i] = 1;
+        generateAllBinaryStrings(n, arr, i + 1, codes);
+    }
+
+    public static void main(String[] args) {
+        CodingBloomFilter cbm = new CodingBloomFilter(7, 30000, 7);
+        List<FlowSet> sets = generateSets(7, 1000);
+
         cbm.encode(sets);
         System.out.println(cbm.lookup(sets));
     }
