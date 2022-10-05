@@ -153,6 +153,21 @@ public class CodingBloomFilter {
         cbm.encode(sets);
         int lookup = cbm.lookup(sets);
 
+        if(args.length == 4) {
+            try {
+                int numSets = Integer.parseInt(args[0]);
+                int numElementsPerSet = Integer.parseInt(args[1]);
+                int numBitsPerFilter = Integer.parseInt(args[2]);
+                int numHashes = Integer.parseInt(args[3]);
+                cbm = new CodingBloomFilter(numSets, numBitsPerFilter, numHashes);
+                sets = generateSets(numSets, numElementsPerSet);
+                cbm.encode(sets);
+                lookup = cbm.lookup(sets);
+            } catch(NumberFormatException nfe) {
+                System.out.println("Please provide a valid Input");
+            }
+        }
+
         File fout = new File("CodingBloomFilterOutput.txt");
         FileOutputStream fos = new FileOutputStream(fout);
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));

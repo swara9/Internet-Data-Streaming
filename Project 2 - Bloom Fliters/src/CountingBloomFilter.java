@@ -121,6 +121,7 @@ public class CountingBloomFilter {
                 System.out.println("Please provide a valid Input");
             }
         }
+
         File fout = new File("CountingBloomFilterOutput.txt");
         FileOutputStream fos = new FileOutputStream(fout);
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
