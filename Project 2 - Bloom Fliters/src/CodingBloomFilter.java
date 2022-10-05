@@ -140,10 +140,3 @@ class FlowSet{
     }
 }
 
-//    Coded Bloom filter
-//        Input: number of sets, number of elements in each set, number of filters, number of bits
-//        in each filter, number of hashes – for demo, they are 7, 1000, 3, 30,000, and 7 respectively
-//        Function:  generate  7  sets  of  1000  elements  each,  their  codes  are  001  through  111
-//        respectively, encode all sets in 3 filters according to the algorithm, perform lookup on all
-//        elements in the 7 sets. All 7000 elements should be distinct.
-//        Output: number of elements whose lookup results are correct
