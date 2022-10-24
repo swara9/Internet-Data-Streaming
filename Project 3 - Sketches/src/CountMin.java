@@ -123,9 +123,9 @@ public class CountMin {
     public static void main(String[] args) throws IOException {
         String file ="project3input.txt";
         BufferedReader reader = new BufferedReader(new FileReader(file));
-        String currentLine = reader.readLine() ;
+        reader.readLine() ;
         List<String[]> flows = new ArrayList<>();
-        currentLine = reader.readLine();
+        String currentLine = reader.readLine();
         while(currentLine!=null){
             String[] flow = currentLine.split("\t");
             flow[1] = flow[1].trim();
