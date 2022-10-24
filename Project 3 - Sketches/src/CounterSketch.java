@@ -1,18 +1,15 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Random;
+import java.util.*;
 
-public class CountMin {
+public class CounterSketch {
     int k;
     int w;
     List<int[]> countMin;
     List<Integer> hashFunctions;
 
-    public CountMin(int k, int w){
+    public CounterSketch(int k, int w){
         this.k = k;
         this.w = w;
         countMin = new ArrayList<>();
@@ -49,29 +46,41 @@ public class CountMin {
             for(int i=0; i<k; i++){
                 hashFun = hashFunctions.get(i);
                 int hashCode = flowId.hashCode();
-                int hashValue = hashCode^hashFun;
-                if(hashValue<0) hashValue = hashValue*-1;
-                int index = hashValue % w;
-                countMin.get(i)[index]+=count;
+                int hashValue = (hashCode^hashFun);
+                int index = hashValue;
+                if(index<0) index = index*-1;
+                index = index % w;
+                if(((hashValue>>31)&1)==1) {
+                    countMin.get(i)[index] += count;
+                }else{
+                    countMin.get(i)[index] -=count;
+                }
             }
         }
     }
 
     public int query(String flowId){
-        int min = Integer.MAX_VALUE;
+        int[] sizeArr = new int[k];
         int hashFun;
         for(int i=0; i<k; i++){
             hashFun = hashFunctions.get(i);
             int hashCode = flowId.hashCode();
-            int hashValue = hashCode^hashFun;
-            if(hashValue<0) hashValue = hashValue*-1;
-            int index = hashValue % w;
-            int curr = countMin.get(i)[index];
-            if(curr < min){
-                min = curr;
+            int hashValue = (hashCode^hashFun);
+            int index = hashValue;
+            if(index<0) index = index*-1;
+            index = index % w;
+            if(((hashValue>>31)&1)==1) {
+                sizeArr[i] = countMin.get(i)[index];
+            }else {
+                sizeArr[i] = -countMin.get(i)[index];
             }
         }
-        return min;
+        Arrays.sort(sizeArr);
+        if(sizeArr.length%2==0){
+            return (sizeArr[sizeArr.length/2]+sizeArr[sizeArr.length/2 +1]) /2;
+        }else{
+            return sizeArr[sizeArr.length/2];
+        }
     }
 
     public float computeAvgError(List<String[]> flows){
@@ -110,7 +119,7 @@ public class CountMin {
 
 
     public static void main(String[] args) throws IOException {
-        String file ="project3input.txt";
+        String file ="Project 3 - Sketches/src/project3input.txt";
         BufferedReader reader = new BufferedReader(new FileReader(file));
         String currentLine = reader.readLine() ;
         List<String[]> flows = new ArrayList<>();
@@ -123,11 +132,11 @@ public class CountMin {
         }
         reader.close();
 
-        CountMin countMin = new CountMin(3, 3000);
-        countMin.record(flows);
-        float avgError = countMin.computeAvgError(flows);
+        CounterSketch counterSketch = new CounterSketch(3, 3000);
+        counterSketch.record(flows);
+        float avgError = counterSketch.computeAvgError(flows);
         System.out.println(avgError);
 
-        countMin.top100Estimated(flows);
+        counterSketch.top100Estimated(flows);
     }
 }
