@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -88,7 +86,7 @@ public class CountMin {
         return avgError;
     }
 
-    public void top100Estimated(List<String[]> flows){
+    public PriorityQueue<String[]> top100Estimated(List<String[]> flows) {
         PriorityQueue<String[]> priorityQueue = new PriorityQueue<>((a, b) -> (Integer.parseInt(b[1]) - Integer.parseInt(a[1])));
         int estimated;
         int actual;
@@ -101,13 +99,26 @@ public class CountMin {
             pqObject[2] = String.valueOf(actual);
             priorityQueue.add(pqObject);
         }
-
-        for(int i=0; i<100; i++){
-            String[] flow = priorityQueue.remove();
-            System.out.println(flow[0]+" "+flow[1]+" "+flow[2]);
-        }
+        return priorityQueue;
     }
 
+    public void generateOutput(List<String[]> flows) throws IOException {
+        File fout = new File("CountMinOutput.txt");
+        FileOutputStream fos = new FileOutputStream(fout);
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+        bw.write("Average error among all flows = "+ computeAvgError(flows));
+        bw.write("\n\n100 flows with largest estimated size: ");
+        bw.write("\n\nFlow ID\t\t\t Estimated size \t\t True size");
+
+        PriorityQueue<String[]> priorityQueue = top100Estimated(flows);
+        for(int i=0; i<100; i++){
+            String[] flow = priorityQueue.remove();
+            bw.write("\n"+flow[0]+"\t "+flow[1]+"\t\t\t\t"+flow[2]);
+        }
+        bw.close();
+        fos.close();
+
+    }
 
     public static void main(String[] args) throws IOException {
         String file ="project3input.txt";
@@ -124,10 +135,16 @@ public class CountMin {
         reader.close();
 
         CountMin countMin = new CountMin(3, 3000);
+        if(args.length == 2) {
+            try {
+                int k = Integer.parseInt(args[0]);
+                int w = Integer.parseInt(args[1]);
+                countMin = new CountMin(k,w);
+            } catch(NumberFormatException nfe) {
+                System.out.println("Please provide a valid Input");
+            }
+        }
         countMin.record(flows);
-        float avgError = countMin.computeAvgError(flows);
-        System.out.println(avgError);
-
-        countMin.top100Estimated(flows);
+        countMin.generateOutput(flows);
     }
 }
